@@ -150,6 +150,7 @@
 				DEVELOPMENT_TEAM = S3ZU53XTFK;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Scorpio's Flamethrower/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Net Speedtest";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -161,7 +162,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.1;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.globexindustries.downloder.ScorpionsFlameThrower.Scorpio-s-Flamethrower";
+				PRODUCT_BUNDLE_IDENTIFIER = com.globexindustries.downloder.NetTest696;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -189,6 +190,7 @@
 				DEVELOPMENT_TEAM = S3ZU53XTFK;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Scorpio's Flamethrower/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Net Speedtest";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -200,7 +202,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.1;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.globexindustries.downloder.ScorpionsFlameThrower.Scorpio-s-Flamethrower";
+				PRODUCT_BUNDLE_IDENTIFIER = com.globexindustries.downloder.NetTest696;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

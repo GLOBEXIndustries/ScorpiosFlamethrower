@@ -16,10 +16,10 @@ struct ContentView: View {
     @StateObject var manager = FlamethrowerManager.shared
     
     // These hold what the user types before hitting "IGNITE"
-    @State private var urlInput: String = "https://fsn1-speed.hetzner.com/10GB.bin"
-    @State private var selectedDuration: Int = 15
+    @State private var urlInput: String = ""
+    @State private var selectedDuration: Int = 1
     
-    let durations = [43200, 2, 15, 30, 60, 120, 240, 480, 720, 1440]
+    let durations = [1, 2, 5, 10, 15, 30, 45, 60]
 
     var body: some View {
         NavigationView {
@@ -28,13 +28,13 @@ struct ContentView: View {
                 Section(header: Text("Configuration")) {
                     HStack {
                         Image(systemName: "globe")
-                        TextField("Target URL", text: $urlInput)
+                        TextField("Source Data URL", text: $urlInput)
                             .keyboardType(.URL)
                             .autocapitalization(.none)
                             .disableAutocorrection(true)
                     }
                     
-                    Picker("Burn Duration", selection: $selectedDuration) {
+                    Picker("Test Time", selection: $selectedDuration) {
                         ForEach(durations, id: \.self) { mins in
                             if mins < 60 {
                                 Text("\(mins) Minutes").tag(mins)
@@ -46,17 +46,20 @@ struct ContentView: View {
                         }
                     }
                     
+                    .disabled(manager.isRunning) // This locks the entire section
+                    .opacity(manager.isRunning ? 0.6 : 1.0) // Visual cue that it's locked
+                    
                     .navigationBarTitleDisplayMode(.inline)
                                 .toolbar {
                                     ToolbarItem(placement: .principal) {
                                         VStack(spacing: 2) {
                                             // 2. Controlled title size to prevent cutoff
-                                            Text("Scorpio's Flamethrower")
+                                            Text("Scorpio's Net Test")
                                                 .font(.system(size: 18, weight: .bold, design: .monospaced))
                                                 .foregroundColor(.primary)
                                             
                                             // 3. Your new sub-header
-                                            Text("NETWORK STRESS TEST UTILITY")
+                                            Text("NETWORK SPEED TEST UTILITY")
                                                 .font(.system(size: 10, weight: .semibold))
                                                 .foregroundColor(.orange)
                                                 .tracking(2)
@@ -73,7 +76,7 @@ struct ContentView: View {
                 }
 
                 // SECTION 2: THE DASHBOARD (The "Gauges")
-                Section(header: Text("Telemetry")) {
+                Section(header: Text("Metrics")) {
                     HStack {
                         Text("Throughput")
                         Spacer()
@@ -81,7 +84,7 @@ struct ContentView: View {
                             .foregroundColor(.orange).bold().monospacedDigit()
                     }
                     HStack {
-                        Text("Total Data Burned")
+                        Text("Total Data Transferred")
                         Spacer()
                         Text("\(String(format: "%.4f", manager.totalDataBurnedGB)) GB")
                             .foregroundColor(.red).bold().monospacedDigit()
@@ -103,7 +106,7 @@ struct ContentView: View {
                             manager.ignite(url: url, durationMinutes: selectedDuration)
                         }
                     }) {
-                        Text(manager.isRunning ? "EXTINGUISH" : "IGNITE")
+                        Text(manager.isRunning ? "STOP" : "START")
                             .font(.headline)
                             .frame(maxWidth: .infinity)
                             .frame(height: 50)
@@ -129,10 +132,13 @@ struct ContentView: View {
                                 }
                                 .listRowBackground(Color.clear) // Keeps the background clean
             }
-            .navigationTitle("Scorpio's Flamethrower")
+            .navigationTitle("Scorpio's Speed Test")
         }
     }
 }
+
+
+
 
 // THIS MAKES THE UI SHOW UP IN XCODE PREVIEW
 #Preview {

@@ -10,7 +10,7 @@ import AppIntents
 import Foundation
 
 struct IgniteFlamethrowerIntent: AppIntent {
-    static var title: LocalizedStringResource = "Ignite Scorpio's Flamethrower"
+    static var title: LocalizedStringResource = "Start Net Test"
     
     @Parameter(title: "Test URL")
     var url: URL
@@ -19,12 +19,12 @@ struct IgniteFlamethrowerIntent: AppIntent {
     var duration: Int // Users can pass 15, 30, 60, etc.
 
     static var parameterSummary: some ParameterSummary {
-        Summary("Burn \(\.$url) for \(\.$duration) minutes")
+        Summary("Run \(\.$url) for \(\.$duration) minutes")
     }
 
     @MainActor
     func perform() async throws -> some IntentResult {
         FlamethrowerManager.shared.ignite(url: url, durationMinutes: duration)
-        return .result(dialog: "Flamethrower Ignited. Stay frosty.")
+        return .result(dialog: "Test Started")
     }
 }

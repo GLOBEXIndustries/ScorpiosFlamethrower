@@ -13,15 +13,33 @@ class FlamethrowerManager: NSObject, URLSessionDataDelegate, ObservableObject {
     private var session: URLSession!
     private var targetURL: URL?
     private var endTime: Date?
-    private var audioPlayer: AVAudioPlayer?
     private var bytesReceivedThisSecond: Int64 = 0
     private var timer: Timer?
 
     override init() {
         super.init()
         
-        // Use a background configuration to resist Jetsam
-        let config = URLSessionConfiguration.background(withIdentifier: "com.scorpio.flamethrower.bg")
+        // Switch to .default for the App Store / "Polite" version
+        let config = URLSessionConfiguration.default
+        
+        config.timeoutIntervalForRequest = 30 // Give it some breathing room
+        config.timeoutIntervalForResource = 60
+        config.httpMaximumConnectionsPerHost = 10 // Beef up the concurrent pipes
+        
+        // Keep these for the burn efficiency
+        config.urlCache = nil
+        config.requestCachePolicy = .reloadIgnoringLocalCacheData
+        
+        self.session = URLSession(configuration: config, delegate: self, delegateQueue: .main)
+    }
+    
+    
+    /*
+    override init() {
+        super.init()
+        
+
+        let config = URLSessionConfiguration.background(withIdentifier: "com.scorpio.nettest.bg")
         
         // Correct Background Settings
         config.isDiscretionary = false // Run immediately, don't wait for Wi-Fi/Power
@@ -33,13 +51,25 @@ class FlamethrowerManager: NSObject, URLSessionDataDelegate, ObservableObject {
         // Initialize session with self as delegate
         self.session = URLSession(configuration: config, delegate: self, delegateQueue: .main)
     }
+ 
+ */
 
     func ignite(url: URL, durationMinutes: Int) {
+        
+        
+        DispatchQueue.main.async {
+                    self.totalDataBurnedGB = 0.0
+                    self.currentThroughputMbps = 0.0
+                    self.isRunning = true
+            self.timeRemaining = String(format: "%02d:00", durationMinutes)
+                }
+        
+        
+        
         self.targetURL = url
         self.endTime = Date().addingTimeInterval(TimeInterval(durationMinutes * 60))
         self.isRunning = true
         
-        startAudioNuke()
         startTelemetryTimer()
         
         // Fire 4 parallel tasks to ensure high network usage
@@ -51,7 +81,6 @@ class FlamethrowerManager: NSObject, URLSessionDataDelegate, ObservableObject {
     func extinguish() {
         isRunning = false
         timer?.invalidate()
-        audioPlayer?.stop()
         currentThroughputMbps = 0
         
         // Cancel all pending tasks
@@ -91,6 +120,9 @@ class FlamethrowerManager: NSObject, URLSessionDataDelegate, ObservableObject {
 
     // MARK: - Helper Methods
     
+    
+    /*
+    
     private func startTelemetryTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             guard let self = self else { return }
@@ -112,96 +144,20 @@ class FlamethrowerManager: NSObject, URLSessionDataDelegate, ObservableObject {
             }
         }
     }
-    
-    private func startAudioNuke() {
-        // This keeps the app 'Active' in the eyes of iOS to prevent suspension
-        let audioSession = AVAudioSession.sharedInstance()
-        try? audioSession.setCategory(.playback, mode: .default, options: [.mixWithOthers])
-        try? audioSession.setActive(true)
-        
-        // Even a silent loop prevents the system from putting the app to sleep
-        // (Assuming you have a silent.mp3 in your project bundle)
-        if let bundlePath = Bundle.main.path(forResource: "silent", ofType: "mp3") {
-            let url = URL(fileURLWithPath: bundlePath)
-            audioPlayer = try? AVAudioPlayer(contentsOf: url)
-            audioPlayer?.numberOfLoops = -1
-            audioPlayer?.play()
-        }
-    }
-}
-
-/*
-
-import Foundation
-import AVFoundation
-import Combine
-
-class FlamethrowerManager: NSObject, URLSessionDataDelegate, ObservableObject {
-    static let shared = FlamethrowerManager()
-    
-    @Published var isRunning = false
-    @Published var currentThroughputMbps: Double = 0.0
-    @Published var totalDataBurnedGB: Double = 0.0
-    @Published var timeRemaining: String = "00:00"
+     */
     
     
-    private var session: URLSession!
-    private var targetURL: URL?
-    private var endTime: Date?
-    private var audioPlayer: AVAudioPlayer?
-    private var bytesReceivedThisSecond: Int64 = 0
-    private var timer: Timer?
-
-    override init() {
-        super.init()
-        let config = URLSessionConfiguration.default
-        config.waitsForConnectivity = true
-        // Important: background compatibility
-        config.allowsCellularAccess = true
-        self.session = URLSession(configuration: config, delegate: self, delegateQueue: .main)
-    }
-
-    func ignite(url: URL, durationMinutes: Int) {
-        self.targetURL = url
-        self.endTime = Date().addingTimeInterval(TimeInterval(durationMinutes * 60))
-        self.isRunning = true
-        
-        startAudioNuke()
-        startTelemetryTimer()
-        burn()
-    }
-
-    func extinguish() {
-        isRunning = false
-        timer?.invalidate()
-        audioPlayer?.stop()
-        currentThroughputMbps = 0
-    }
-
-    private func burn() {
-        guard isRunning, let url = targetURL, let end = endTime, Date() < end else {
-            extinguish()
-            return
-        }
-        session.dataTask(with: url).resume()
-    }
-
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        bytesReceivedThisSecond += Int64(data.count)
-        totalDataBurnedGB += Double(data.count) / 1_073_741_824.0
-    }
-
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        if isRunning { burn() }
-    }
-
     private func startTelemetryTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-            // Calculate Mbps
-            self.currentThroughputMbps = Double(self.bytesReceivedThisSecond * 8) / 1_000_000.0
+        // 1. Change interval to 2.5 seconds
+        timer = Timer.scheduledTimer(withTimeInterval: 2.5, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            
+            // 2. Calculate Mbps based on a 2.5-second window
+            // Formula: (Bytes * 8 bits) / (1,000,000 bits per Mb) / 2.5 seconds
+            self.currentThroughputMbps = (Double(self.bytesReceivedThisSecond * 8) / 1_000_000.0) / 2.5
             self.bytesReceivedThisSecond = 0
             
-            // Update Countdown
+            // 3. Update the Countdown
             if let end = self.endTime {
                 let remaining = end.timeIntervalSinceNow
                 if remaining > 0 {
@@ -213,9 +169,7 @@ class FlamethrowerManager: NSObject, URLSessionDataDelegate, ObservableObject {
                 }
             }
         }
-        
     }
-    private func startAudioNuke() { /* Your existing audio code is fine */ }
+    
 }
 
-*/
