@@ -1,3 +1,11 @@
+//
+//  IgniteFlamethrowerIntent.swift
+//  Scorpio's Flamethrower
+//
+//  Created by Ian McHale on 2/20/26.
+//
+
+
 import AppIntents
 import Foundation
 

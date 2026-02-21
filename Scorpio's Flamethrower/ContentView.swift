@@ -1,67 +1,140 @@
+//
+//  ContentView.swift
+//  Scorpio's Flamethrower
+//
+//  Created by Ian McHale on 2/20/26.
+//
+
+
+
+
+
 import SwiftUI
 
 struct ContentView: View {
-    // 1. Link to the shared manager
+    // This connects to your "Electrician's Wiring" (The Manager)
     @StateObject var manager = FlamethrowerManager.shared
     
-    // 2. These local states handle the UI inputs before "Ignite" is pressed
-    @State private var urlInput: String = "https://cia.gov"
-    @State private var selectedDuration: Int = 60
+    // These hold what the user types before hitting "IGNITE"
+    @State private var urlInput: String = "https://fsn1-speed.hetzner.com/10GB.bin"
+    @State private var selectedDuration: Int = 15
     
-    let durations = [15, 30, 60, 120, 240, 600, 720, 1440]
+    let durations = [43200, 2, 15, 30, 60, 120, 240, 480, 720, 1440]
 
     var body: some View {
         NavigationView {
             Form {
+                // SECTION 1: THE INPUTS (The "Light Switches")
                 Section(header: Text("Configuration")) {
-                    TextField("Target URL", text: $urlInput) // Using local @State
-                        .keyboardType(.URL)
-                        .autocapitalization(.none)
-                        .disableAutocorrection(true)
+                    HStack {
+                        Image(systemName: "globe")
+                        TextField("Target URL", text: $urlInput)
+                            .keyboardType(.URL)
+                            .autocapitalization(.none)
+                            .disableAutocorrection(true)
+                    }
                     
-                    Picker("Duration", selection: $selectedDuration) {
-                        ForEach(durations, id: \.self) { min in
-                            Text(min >= 60 ? "\(min/60) Hours" : "\(min) Minutes").tag(min)
+                    Picker("Burn Duration", selection: $selectedDuration) {
+                        ForEach(durations, id: \.self) { mins in
+                            if mins < 60 {
+                                Text("\(mins) Minutes").tag(mins)
+                            } else if mins == 60 {
+                                Text("1 Hour").tag(mins)
+                            } else {
+                                Text("\(mins / 60) Hours").tag(mins)
+                            }
                         }
                     }
+                    
+                    .navigationBarTitleDisplayMode(.inline)
+                                .toolbar {
+                                    ToolbarItem(placement: .principal) {
+                                        VStack(spacing: 2) {
+                                            // 2. Controlled title size to prevent cutoff
+                                            Text("Scorpio's Flamethrower")
+                                                .font(.system(size: 18, weight: .bold, design: .monospaced))
+                                                .foregroundColor(.primary)
+                                            
+                                            // 3. Your new sub-header
+                                            Text("NETWORK STRESS TEST UTILITY")
+                                                .font(.system(size: 10, weight: .semibold))
+                                                .foregroundColor(.orange)
+                                                .tracking(2)
+                                            
+                                            // sub sub header
+                                            Text("By GLOBEX Industries")
+                                                .font(.system(size: 8, weight: .semibold))
+                                                .foregroundColor(.orange)
+                                                .tracking(2)
+                                        }
+                                    }
+                                }
+                    
                 }
 
+                // SECTION 2: THE DASHBOARD (The "Gauges")
                 Section(header: Text("Telemetry")) {
-                    TelemetryRow(label: "Throughput", value: "\(String(format: "%.2f", manager.currentThroughputMbps)) Mbps", color: .orange)
-                    TelemetryRow(label: "Total Burned", value: "\(String(format: "%.4f", manager.totalDataBurnedGB)) GB", color: .red)
-                    TelemetryRow(label: "Remaining", value: manager.timeRemaining, color: .primary)
+                    HStack {
+                        Text("Throughput")
+                        Spacer()
+                        Text("\(String(format: "%.2f", manager.currentThroughputMbps)) Mbps")
+                            .foregroundColor(.orange).bold().monospacedDigit()
+                    }
+                    HStack {
+                        Text("Total Data Burned")
+                        Spacer()
+                        Text("\(String(format: "%.4f", manager.totalDataBurnedGB)) GB")
+                            .foregroundColor(.red).bold().monospacedDigit()
+                    }
+                    HStack {
+                        Text("Time Remaining")
+                        Spacer()
+                        Text(manager.timeRemaining)
+                            .monospacedDigit().bold()
+                    }
                 }
 
-                Button(action: {
-                    if manager.isRunning {
-                        manager.extinguish()
-                    } else if let url = URL(string: urlInput) {
-                        manager.ignite(url: url, durationMinutes: selectedDuration)
+                // SECTION 3: THE BIG RED BUTTON
+                Section {
+                    Button(action: {
+                        if manager.isRunning {
+                            manager.extinguish()
+                        } else if let url = URL(string: urlInput) {
+                            manager.ignite(url: url, durationMinutes: selectedDuration)
+                        }
+                    }) {
+                        Text(manager.isRunning ? "EXTINGUISH" : "IGNITE")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
+                            .background(manager.isRunning ? Color.red : Color.orange)
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
                     }
-                }) {
-                    Text(manager.isRunning ? "EXTINGUISH" : "IGNITE")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(manager.isRunning ? Color.red : Color.orange)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+                    .listRowBackground(Color.clear) // Makes the button stand out
                 }
+                
+                
+                // NEW LOGO SECTION
+                                Section {
+                                    HStack {
+                                        Spacer()
+                                        Image("globex") // Ensure your PNG is named "globex" in Assets.xcassets
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(height: 100) // Adjust height as needed
+                                            .opacity(0.8) // Subtle sysadmin vibe
+                                        Spacer()
+                                    }
+                                }
+                                .listRowBackground(Color.clear) // Keeps the background clean
             }
             .navigationTitle("Scorpio's Flamethrower")
         }
     }
 }
 
-// Helper view to keep code clean
-struct TelemetryRow: View {
-    let label: String
-    let value: String
-    let color: Color
-    var body: some View {
-        HStack {
-            Text(label)
-            Spacer()
-            Text(value).foregroundColor(color).bold().monospacedDigit()
-        }
-    }
+// THIS MAKES THE UI SHOW UP IN XCODE PREVIEW
+#Preview {
+    ContentView()
 }
