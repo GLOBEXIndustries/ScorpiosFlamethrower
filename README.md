@@ -38,6 +38,6 @@ As this utility bypasses standard App Store background limitations, it is distri
 ## 📡 Usage Configuration
 
 <p align="center">
-  <img src="https://b2.glbx.uk/screenshot1">
-  <img src="https://b2.glbx.uk/screenshot2">
+  <img src="https://github.com/GLOBEXIndustries/ScorpiosFlamethrower/blob/main/screenshot1.png">
+  <img src="https://github.com/GLOBEXIndustries/ScorpiosFlamethrower/blob/main/screenshot2.png">
 </p>
