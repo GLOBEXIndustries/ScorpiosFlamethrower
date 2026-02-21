@@ -3,10 +3,6 @@ Scorpios Flamethrower iOS Network Stress Test Utility
 
 # `README.md`
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/YOUR_USERNAME/scorpios-flamethrower/main/AppLogo.png" width="150" alt="Scorpio's Flamethrower Logo">
-</p>
-
 <h1 align="center">Scorpio's Flamethrower</h1>
 
 <p align="center">
@@ -40,3 +36,8 @@ As this utility bypasses standard App Store background limitations, it is distri
 3.  **Trust:** Navigate to `Settings > General > VPN & Device Management` to trust the developer profile.
 
 ## 📡 Usage Configuration
+
+<p align="center">
+  <img src="https://b2.glbx.uk/screenshot1">
+  <img src="https://b2.glbx.uk/screenshot2">
+</p>
