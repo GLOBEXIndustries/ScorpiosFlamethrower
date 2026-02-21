@@ -37,6 +37,8 @@ As this utility bypasses standard App Store background limitations, it is distri
 
 ## 📡 Usage Configuration
 
+To use, set the URL to a server hosting a large, multigigabyte file that is geographically close to you, then select the runtime from the dropdown
+
 <p align="center">
   <img src="https://github.com/GLOBEXIndustries/ScorpiosFlamethrower/blob/main/screenshot1.png">
   <img src="https://github.com/GLOBEXIndustries/ScorpiosFlamethrower/blob/main/screenshot2.png">
